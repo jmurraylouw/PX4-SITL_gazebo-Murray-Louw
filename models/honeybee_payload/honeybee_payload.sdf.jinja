@@ -57,14 +57,14 @@
       <pose>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>0.015</mass>
+        <mass>1e-08</mass> <!-- Changed inertia of IMU unit to neglible -->
         <inertia>
-          <ixx>1e-05</ixx>
+          <ixx>1e-08</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>1e-05</iyy>
+          <iyy>1e-08</iyy>
           <iyz>0</iyz>
-          <izz>1e-05</izz>
+          <izz>1e-08</izz>
         </inertia>
       </inertial>
     </link>
@@ -428,14 +428,14 @@
         <pose>0 0 0 0 0 0</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
-          <mass>0.01</mass>
+          <mass>1e-08</mass>
           <inertia>
-            <ixx>2.1733e-06</ixx>
+            <ixx>1e-08</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>2.1733e-06</iyy>
+            <iyy>1e-08</iyy>
             <iyz>0</iyz>
-            <izz>1.8e-07</izz>
+            <izz>1e-08</izz>
           </inertia>
         </inertial>
         <visual name='visual'>
@@ -472,9 +472,10 @@
       <child>gps0::link</child>
     </joint>
 
-    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+    <!-- <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
       <robotNamespace/>
-    </plugin>
+    </plugin> -->
+
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
       <pubRate>100</pubRate>
@@ -622,5 +623,6 @@
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
+    <plugin name="model_push" filename="libmodel_push.so"/>
   </model>
 </sdf>
