@@ -1,0 +1,9 @@
+syntax = "proto2";
+package mav_msgs.msgs;
+
+message CommandMotorThrottle
+{
+  required float   dt = 1;
+  required int64   seq = 2;
+  repeated float   motor_throttle = 3 [packed=true];
+}
