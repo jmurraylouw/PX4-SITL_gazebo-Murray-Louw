@@ -59,6 +59,7 @@
 #include <Airspeed.pb.h>
 #include <CommandMotorSpeed.pb.h>
 #include <MotorSpeed.pb.h>
+#include <CommandMotorThrottle.pb.h> // @jmurraylouw
 #include <Imu.pb.h>
 #include <OpticalFlow.pb.h>
 #include <Range.pb.h>
@@ -82,6 +83,7 @@ static const std::regex kDefaultAirspeedModelJointNaming(".*(airspeed)(.*_joint)
 namespace gazebo {
 
 typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorSpeed> CommandMotorSpeedPtr;
+typedef const boost::shared_ptr<const mav_msgs::msgs::CommandMotorThrottle> CommandMotorThrottlePtr; // @jmurraylouw
 typedef const boost::shared_ptr<const nav_msgs::msgs::Odometry> OdomPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Airspeed> AirspeedPtr;
 typedef const boost::shared_ptr<const sensor_msgs::msgs::Groundtruth> GtPtr;
@@ -104,6 +106,7 @@ static const std::string kDefaultNamespace = "";
 // This just proxies the motor commands from command/motor_speed to the single motors via internal
 // ConsPtr passing, such that the original commands don't have to go n_motors-times over the wire.
 static const std::string kDefaultMotorVelocityReferencePubTopic = "/gazebo/command/motor_speed";
+static const std::string kDefaultMotorReferencePubTopic = "/command/motor"; // @jmurraylouw
 
 static const std::string kDefaultImuTopic = "/imu";
 static const std::string kDefaultOpticalFlowTopic = "/px4flow/link/opticalFlow";
@@ -142,6 +145,7 @@ protected:
 
 private:
   bool received_first_actuator_{false};
+  bool use_motor_velocity{true}; // @jmurraylouw
   Eigen::VectorXd input_reference_;
 
   float protocol_version_{2.0};
@@ -150,11 +154,13 @@ private:
 
   std::string namespace_{kDefaultNamespace};
   std::string motor_velocity_reference_pub_topic_{kDefaultMotorVelocityReferencePubTopic};
+  std::string motor_reference_pub_topic_{kDefaultMotorReferencePubTopic}; // @jmurraylouw
   std::string mavlink_control_sub_topic_;
   std::string link_name_;
 
   transport::NodePtr node_handle_;
   transport::PublisherPtr motor_velocity_reference_pub_;
+  transport::PublisherPtr motor_reference_pub_; // @jmurraylouw
   transport::SubscriberPtr mav_control_sub_;
 
   physics::ModelPtr model_{};
@@ -187,6 +193,7 @@ private:
   void SendGroundTruth();
   void handle_actuator_controls();
   void handle_control(double _dt);
+  void handle_actuators(double dt); // @jmurraylouw
   bool IsRunning();
   void onSigInt();
 

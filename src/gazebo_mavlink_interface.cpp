@@ -203,8 +203,21 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   node_handle_ = transport::NodePtr(new transport::Node());
   node_handle_->Init(namespace_);
 
-  getSdfParam<std::string>(_sdf, "motorSpeedCommandPubTopic", motor_velocity_reference_pub_topic_,
-      motor_velocity_reference_pub_topic_);
+
+  // @jmurraylouw
+  if (_sdf->HasElement("motorSpeedCommandPubTopic")) {
+    getSdfParam<std::string>(_sdf, "motorSpeedCommandPubTopic", motor_velocity_reference_pub_topic_,
+        motor_velocity_reference_pub_topic_);
+    use_motor_velocity = true;
+    gzerr << "[gazebo_mavlink_interface] Using motor speed command, not motor throttle command.\n";
+
+  } else {
+    getSdfParam<std::string>(_sdf, "motorCommandPubTopic", motor_reference_pub_topic_,
+        motor_reference_pub_topic_);
+    use_motor_velocity = false;
+    std::cout << "[gazebo_mavlink_interface] Using motor throttle command, not motor speed command.\n" << std::endl;
+  }
+
   getSdfParam<std::string>(_sdf, "imuSubTopic", imu_sub_topic_, imu_sub_topic_);
   getSdfParam<std::string>(_sdf, "visionSubTopic", vision_sub_topic_, vision_sub_topic_);
   getSdfParam<std::string>(_sdf, "opticalFlowSubTopic",
@@ -448,8 +461,14 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
   CreateSensorSubscription(&GazeboMavlinkInterface::GpsCallback, this, joints, nested_model, kDefaultGPSModelNaming);
   CreateSensorSubscription(&GazeboMavlinkInterface::AirspeedCallback, this, joints, nested_model, kDefaultAirspeedModelJointNaming);
 
-  // Publish gazebo's motor_speed message
-  motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
+  // @jmurraylouw
+  if (use_motor_velocity) {
+    // Publish gazebo's motor_speed message
+    motor_velocity_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + motor_velocity_reference_pub_topic_, 1);
+  } else {
+    // Publish custom motor throttle message
+    motor_reference_pub_ = node_handle_->Advertise<mav_msgs::msgs::CommandMotorThrottle>("~/" + model_->GetName() + motor_reference_pub_topic_, 1);
+  }
 
 #if GAZEBO_MAJOR_VERSION >= 9
   last_time_ = world_->SimTime();
@@ -597,23 +616,28 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
   handle_actuator_controls();
 
-  handle_control(dt);
+  // @jmurraylouw
+  if(use_motor_velocity) {
+    handle_control(dt);
 
-  if (received_first_actuator_) {
-    mav_msgs::msgs::CommandMotorSpeed turning_velocities_msg;
+    if (received_first_actuator_) {
+      mav_msgs::msgs::CommandMotorSpeed turning_velocities_msg;
 
-    for (int i = 0; i < input_reference_.size(); i++) {
-      if (last_actuator_time_ == 0 || (current_time - last_actuator_time_).Double() > 0.2) {
-        turning_velocities_msg.add_motor_speed(0);
-      } else {
-        turning_velocities_msg.add_motor_speed(input_reference_[i]);
+      for (int i = 0; i < input_reference_.size(); i++) {
+        if (last_actuator_time_ == 0 || (current_time - last_actuator_time_).Double() > 0.2) {
+          turning_velocities_msg.add_motor_speed(0);
+        } else {
+          turning_velocities_msg.add_motor_speed(input_reference_[i]);
+        }
       }
-    }
-    // TODO Add timestamp and Header
-    // turning_velocities_msg->header.stamp.sec = current_time.sec;
-    // turning_velocities_msg->header.stamp.nsec = current_time.nsec;
+      // TODO Add timestamp and Header
+      // turning_velocities_msg->header.stamp.sec = current_time.sec;
+      // turning_velocities_msg->header.stamp.nsec = current_time.nsec;
 
-    motor_velocity_reference_pub_->Publish(turning_velocities_msg);
+      motor_velocity_reference_pub_->Publish(turning_velocities_msg);
+    }
+  } else {
+    handle_actuators(dt); // @jmurraylouw
   }
 
   last_time_ = current_time;
@@ -1110,13 +1134,18 @@ void GazeboMavlinkInterface::handle_actuator_controls() {
   Eigen::VectorXd actuator_controls = mavlink_interface_->GetActuatorControls();
   if (actuator_controls.size() < n_out_max) return; //TODO: Handle this properly
   for (int i = 0; i < input_reference_.size(); i++) {
-    if (armed) {
-      input_reference_[i] = (actuator_controls[input_index_[i]] + input_offset_[i])
-          * input_scaling_[i] + zero_position_armed_[i];
-      // std::cout << input_reference_ << ", ";
-    } else {
-      input_reference_[i] = zero_position_disarmed_[i];
-      // std::cout << input_reference_ << ", ";
+    // @jmurraylouw
+    if(use_motor_velocity) {
+      if (armed) {
+        input_reference_[i] = (actuator_controls[input_index_[i]] + input_offset_[i])
+            * input_scaling_[i] + zero_position_armed_[i];
+        // std::cout << input_reference_ << ", ";
+      } else {
+        input_reference_[i] = zero_position_disarmed_[i];
+        // std::cout << input_reference_ << ", ";
+      }
+    } else { // command motor throttle // @jmurraylouw
+      input_reference_[i] = actuator_controls[input_index_[i]];
     }
   }
   // std::cout << "Input Reference: " << input_reference_.transpose() << std::endl;
@@ -1184,6 +1213,20 @@ void GazeboMavlinkInterface::handle_control(double _dt)
       }
     }
   }
+}
+
+void GazeboMavlinkInterface::handle_actuators(double dt) // @jmurraylouw
+{
+  static int64_t seq = 0;
+  mav_msgs::msgs::CommandMotorThrottle motors;
+
+  motors.set_dt(dt);
+  motors.set_seq(seq++);
+
+  for (int i = 0; i < input_reference_.size(); i++) {
+    motors.add_motor_throttle(constrain((double)input_reference_[i], 0.0, 1.0));
+  }
+  motor_reference_pub_->Publish(motors);
 }
 
 bool GazeboMavlinkInterface::IsRunning()
