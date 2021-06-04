@@ -32,6 +32,10 @@
 
 namespace gazebo {
 
+  // Defaults @jmurraylouw
+  static const std::string kConnectGazeboToRosSubtopic = "connect_gazebo_to_ros_subtopic";
+  static const std::string kConnectRosToGazeboSubtopic = "connect_ros_to_gazebo_subtopic";
+
 /**
  * \brief Obtains a parameter from sdf.
  * \param[in] sdf Pointer to the sdf object.
