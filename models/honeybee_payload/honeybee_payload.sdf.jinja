@@ -54,7 +54,7 @@
       <imuSubTopic>/imu</imuSubTopic>
       <magSubTopic>/mag</magSubTopic>
       <baroSubTopic>/baro</baroSubTopic>
-      <motorCommandPubTopic>/command/motor</motorCommandPubTopic> <!-- @jmurraylouw -->
+      <motorCommandPubTopic>/command/motor</motorCommandPubTopic>
 
       <mavlink_addr>INADDR_ANY</mavlink_addr>
       <mavlink_tcp_port>{{ mavlink_tcp_port }}</mavlink_tcp_port>
@@ -106,35 +106,25 @@
       </motor_models>
     </plugin>
 
+    <!-- <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+      <robotNamespace/>
+    </plugin> -->
+
     <model name='gps0'>
       <link name='link'>
         <pose>0 0 0 0 0 0</pose>
         <inertial>
           <pose>0 0 0 0 0 0</pose>
-          <mass>1e-08</mass>
+          <mass>1e-10</mass>
           <inertia>
-            <ixx>1e-08</ixx>
+            <ixx>1e-10</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>1e-08</iyy>
+            <iyy>1e-10</iyy>
             <iyz>0</iyz>
-            <izz>1e-08</izz>
+            <izz>1e-10</izz>
           </inertia>
         </inertial>
-        <visual name='visual'>
-          <geometry>
-            <cylinder>
-              <radius>0.01</radius>
-              <length>0.002</length>
-            </cylinder>
-          </geometry>
-          <material>
-            <script>
-              <name>Gazebo/Black</name>
-              <uri>__default__</uri>
-            </script>
-          </material>
-        </visual>
         <sensor name='gps' type='gps'>
           <pose>0 0 0 0 0 0</pose>
           <plugin name='gps_plugin' filename='libgazebo_gps_plugin.so'>
@@ -155,13 +145,10 @@
       <child>gps0::link</child>
     </joint>
 
-    <!-- <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
-      <robotNamespace/>
-    </plugin> -->
 
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
-      <pubRate>100</pubRate>
+      <pubRate>20</pubRate>
       <noiseDensity>0.0004</noiseDensity>
       <randomWalk>6.4e-06</randomWalk>
       <biasCorrelationTime>600</biasCorrelationTime>
@@ -170,7 +157,7 @@
 
     <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
       <robotNamespace/>
-      <pubRate>50</pubRate>
+      <pubRate>10</pubRate>
       <baroTopic>/baro</baroTopic>
       <baroDriftPaPerSec>0</baroDriftPaPerSec>
     </plugin>
@@ -179,11 +166,11 @@
       <robotNamespace/>
       <linkName>base_link</linkName>
       <imuTopic>/imu</imuTopic>
-      <gyroscopeNoiseDensity>0.00018665</gyroscopeNoiseDensity>
+      <gyroscopeNoiseDensity>0.0002443</gyroscopeNoiseDensity>
       <gyroscopeRandomWalk>3.8785e-05</gyroscopeRandomWalk>
       <gyroscopeBiasCorrelationTime>1000.0</gyroscopeBiasCorrelationTime>
       <gyroscopeTurnOnBiasSigma>0.0087</gyroscopeTurnOnBiasSigma>
-      <accelerometerNoiseDensity>0.00186</accelerometerNoiseDensity>
+      <accelerometerNoiseDensity>0.000150</accelerometerNoiseDensity>
       <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
