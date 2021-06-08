@@ -46,7 +46,7 @@
       <velocity_decay/>
     </link>
 
-    <link name='payload'>
+    <!-- <link name='payload'>
       <pose frame=''> 0 0 -1 0 0 0</pose>
       <inertial>
         <mass>0.2</mass>
@@ -92,7 +92,7 @@
         <axis2>
           <xyz>0 1 0</xyz>
         </axis2>
-    </joint>
+    </joint> -->
 
     <link name='/imu_link'>
       <pose frame=''>0 0 0 0 -0 0</pose>
