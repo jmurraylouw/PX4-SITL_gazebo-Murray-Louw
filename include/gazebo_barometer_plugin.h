@@ -102,6 +102,9 @@ namespace gazebo {
 
     double baro_drift_pa_per_sec_;
     double baro_drift_pa_;
+
+    bool has_noise; // Specify whether baro should have noise or not
+
   }; // class BarometerPlugin
 } // namespace gazebo
 #endif // _GAZEBO_BAROMETER_PLUGIN_HH_
