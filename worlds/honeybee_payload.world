@@ -19,6 +19,11 @@
          topic to a ROS topic (or vise versa). -->
     <!-- <plugin name="ros_interface_plugin" filename="libgazebo_ros_interface_plugin.so"/> -->
 
+    <!-- Plugin to sync time with Simulink -->
+    <plugin name="GazeboPlugin" filename="/home/esl/Masters/Developer/MATLAB/Quad_Sim_Murray/ROS/GazeboPlugin/export/lib/libGazeboCoSimPlugin.so">
+      <portNumber>14581</portNumber>
+    </plugin>
+
     <physics name='default_physics' default='0' type='ode'>
       <gravity>0 0 -9.8066</gravity>
       <ode>
