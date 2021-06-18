@@ -103,6 +103,25 @@ class GazeboForcesMomentsActuatorsPlugin : public ModelPlugin {
         std::unique_ptr<FirstOrderFilter<double>>  dE_filter_;
         std::unique_ptr<FirstOrderFilter<double>>  dR_filter_;
 
+        // Declare variables from OnUpdate:
+        // --------------------------------
+
+        double commands[MAX_MOTORS];
+        double motors[MAX_MOTORS];
+        double dt;
+        int i;
+
+        // Apply first order filter.
+        double z;
+        double dA;
+        double dE;
+        double dR;
+
+        // Calculate forces and moments.
+        ignition::math::Vector3d force;
+        ignition::math::Vector3d moment; // Moments in XYZ, controls in NED
+
+
         bool IsRunning();
         void ApplyMotorModel(double commnads[], double motors[], int num_motors);
         void CalcControls4Cross(double motors[]);

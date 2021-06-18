@@ -75,20 +75,19 @@ void GazeboForcesMomentsActuatorsPlugin::Load(physics::ModelPtr _model, sdf::Ele
     dA_filter_.reset(new FirstOrderFilter<double>(motor_time_constant_, motor_time_constant_, 0));
     dE_filter_.reset(new FirstOrderFilter<double>(motor_time_constant_, motor_time_constant_, 0));
     dR_filter_.reset(new FirstOrderFilter<double>(motor_time_constant_, motor_time_constant_, 0));
-}
-
-// This gets called by the world update start event.
-void GazeboForcesMomentsActuatorsPlugin::OnUpdate(const common::UpdateInfo& _info) {
-    double commands[MAX_MOTORS];
-    double motors[MAX_MOTORS];
-    double dt;
-    int i;
 
     // Connect to ROS
     if(!pubs_and_subs_created_) {
         CreatePubsAndSubs();
         pubs_and_subs_created_ = true;
     }
+}
+
+// This gets called by the world update start event.
+void GazeboForcesMomentsActuatorsPlugin::OnUpdate(const common::UpdateInfo& _info) {
+
+    // Start measuring time
+    auto begin = std::chrono::high_resolution_clock::now();
 
     // Wait for new motor commands
     std::unique_lock<std::mutex> lock(last_motor_message_mutex_);
@@ -116,16 +115,22 @@ void GazeboForcesMomentsActuatorsPlugin::OnUpdate(const common::UpdateInfo& _inf
     }
 
     // Apply first order filter.
-    double z = z_filter_->updateFilter(virtual_controls[0], dt);
-    double dA = dA_filter_->updateFilter(virtual_controls[1], dt);
-    double dE = dE_filter_->updateFilter(virtual_controls[2], dt);
-    double dR = dR_filter_->updateFilter(virtual_controls[3], dt);
+    z = z_filter_->updateFilter(virtual_controls[0], dt);
+    dA = dA_filter_->updateFilter(virtual_controls[1], dt);
+    dE = dE_filter_->updateFilter(virtual_controls[2], dt);
+    dR = dR_filter_->updateFilter(virtual_controls[3], dt);
 
     // Calculate forces and moments.
-    ignition::math::Vector3d force = ignition::math::Vector3d(0, 0, z);
-    ignition::math::Vector3d moment = ignition::math::Vector3d(dA, -dE, -dR); // Moments in XYZ, controls in NED
+    force = ignition::math::Vector3d(0, 0, z);
+    moment = ignition::math::Vector3d(dA, -dE, -dR); // Moments in XYZ, controls in NED
     link_->AddRelativeForce(force);
     link_->AddRelativeTorque(moment);
+
+    // Stop measuring time and calculate the elapsed time //@jmurraylouw
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+    printf("Time measured: %.5f milli seconds.\n", elapsed.count() * 1e-6);
+
 }
 
 // Determine if simulation is running
