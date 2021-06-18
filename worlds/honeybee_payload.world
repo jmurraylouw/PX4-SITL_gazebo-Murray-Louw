@@ -28,7 +28,7 @@
       <gravity>0 0 -9.8066</gravity>
       <ode>
         <solver>
-          <type>world</type>
+          <type>quick</type>
           <iters>10</iters>
           <sor>1.3</sor>
           <use_dynamic_moi_rescaling>0</use_dynamic_moi_rescaling>
@@ -45,10 +45,5 @@
       <real_time_update_rate>250</real_time_update_rate>
       <magnetic_field>6.0e-6 2.3e-5 -4.2e-5</magnetic_field>
     </physics>
-    <gui fullscreen='0'>
-      <camera name='user_camera'>
-        <pose>0 -10 6 0 0.3 1.5707</pose>
-      </camera>
-    </gui>
   </world>
 </sdf>
