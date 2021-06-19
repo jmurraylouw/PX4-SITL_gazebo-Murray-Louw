@@ -76,11 +76,12 @@ void GazeboForcesMomentsActuatorsPlugin::Load(physics::ModelPtr _model, sdf::Ele
     dE_filter_.reset(new FirstOrderFilter<double>(motor_time_constant_, motor_time_constant_, 0));
     dR_filter_.reset(new FirstOrderFilter<double>(motor_time_constant_, motor_time_constant_, 0));
 
-    // Connect to ROS
-    if(!pubs_and_subs_created_) {
-        CreatePubsAndSubs();
-        pubs_and_subs_created_ = true;
-    }
+    // Subscribe to motor commands
+    motor_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorThrottle>("~/" + model_->GetName() + motor_sub_topic_, &GazeboForcesMomentsActuatorsPlugin::MotorCommandCallback, this);
+    // command_sub_ = node_handle_->Subscribe<mav_msgs::msgs::CommandMotorSpeed>("~/" + model_->GetName() + command_sub_topic_, &GazeboMotorModel::VelocityCallback, this);
+    std::cout << "[gazebo_forces_moments_actuators_plugin]: Subscribe to gz topic: "<< motor_sub_topic_ << std::endl;
+
+    // CreatePubsAndSubs();
 }
 
 // This gets called by the world update start event.
@@ -129,7 +130,7 @@ void GazeboForcesMomentsActuatorsPlugin::OnUpdate(const common::UpdateInfo& _inf
     // Stop measuring time and calculate the elapsed time //@jmurraylouw
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-    printf("Time measured: %.5f milli seconds.\n", elapsed.count() * 1e-6);
+    // printf("Time measured: %.5f milli seconds.\n", elapsed.count() * 1e-6);
 
 }
 
@@ -211,9 +212,6 @@ bool GazeboForcesMomentsActuatorsPlugin::IsValidConfig(std::string config) {
 void GazeboForcesMomentsActuatorsPlugin::CreatePubsAndSubs() {
     // Create temporary "ConnectRosToGazeboTopic" publisher and message
     gazebo::transport::PublisherPtr gz_connect_ros_to_gazebo_topic_pub = node_handle_->Advertise<std_msgs::msgs::ConnectRosToGazeboTopic>("~/" + kConnectRosToGazeboSubtopic, 1);
-
-    // Subscribe to motor commands
-    motor_sub_ = node_handle_->Subscribe("~/" + model_->GetName() + motor_sub_topic_, &GazeboForcesMomentsActuatorsPlugin::MotorCommandCallback, this);
 
     // Connect to ROS
     std_msgs::msgs::ConnectRosToGazeboTopic connect_ros_to_gazebo_topic_msg;

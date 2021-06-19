@@ -158,7 +158,7 @@
       <send_odometry>1</send_odometry>
       <enable_lockstep>1</enable_lockstep>
       <use_tcp>1</use_tcp>
-      <motorCommandPubTopic>/command/motor</motorCommandPubTopic>
+      <motorCommandPubTopic>/gazebo/command/motor_throttle</motorCommandPubTopic>
     </plugin>
     <static>0</static>
 

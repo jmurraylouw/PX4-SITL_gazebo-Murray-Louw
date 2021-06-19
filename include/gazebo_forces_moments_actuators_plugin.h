@@ -24,7 +24,7 @@ const std::string valid_copter_configs[] = {"4x", "4+"};
 static const std::string defaultNamespace = "";
 static const std::string defaultLinkName = "base_link";
 
-static const std::string defaultMotorCommandSubTopic = "/command/motor";
+static const std::string defaultMotorCommandSubTopic = "/gazebo/command/motor_throttle";
 
 // Default params
 static const std::string defaultCopterConfig = "4x";
