@@ -87,17 +87,15 @@ void GazeboForcesMomentsActuatorsPlugin::Load(physics::ModelPtr _model, sdf::Ele
 // This gets called by the world update start event.
 void GazeboForcesMomentsActuatorsPlugin::OnUpdate(const common::UpdateInfo& _info) {
 
-    // Start measuring time
-    auto begin = std::chrono::high_resolution_clock::now();
-
+    // Commented out this part to run at realtime factor = 1: //@jmurraylouw
     // Wait for new motor commands
-    std::unique_lock<std::mutex> lock(last_motor_message_mutex_);
+    // std::unique_lock<std::mutex> lock(last_motor_message_mutex_);
 
-    if (previous_motor_seq_ > 0) {
-        while (previous_motor_seq_ == last_motor_message_.seq() && IsRunning()) {
-            last_motor_message_cond_.wait_for(lock, std::chrono::microseconds(10));
-        }
-    }
+    // if (previous_motor_seq_ > 0) {
+    //     while (previous_motor_seq_ == last_motor_message_.seq() && IsRunning()) {
+    //         last_motor_message_cond_.wait_for(lock, std::chrono::microseconds(10));
+    //     }
+    // }
 
     previous_motor_seq_ = last_motor_message_.seq();
 
@@ -126,12 +124,6 @@ void GazeboForcesMomentsActuatorsPlugin::OnUpdate(const common::UpdateInfo& _inf
     moment = ignition::math::Vector3d(dA, -dE, -dR); // Moments in XYZ, controls in NED
     link_->AddRelativeForce(force);
     link_->AddRelativeTorque(moment);
-
-    // Stop measuring time and calculate the elapsed time //@jmurraylouw
-    auto end = std::chrono::high_resolution_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-    // printf("Time measured: %.5f milli seconds.\n", elapsed.count() * 1e-6);
-
 }
 
 // Determine if simulation is running
@@ -185,13 +177,14 @@ void GazeboForcesMomentsActuatorsPlugin::CalcControls4Plus(double motors[]) {
 }
 
 void GazeboForcesMomentsActuatorsPlugin::MotorCommandCallback(CommandMotorThrottlePtr& motor_msg) {
-    std::unique_lock<std::mutex> lock(last_motor_message_mutex_);
+    // Commented out these parts to run at realtime factor = 1: //@jmurraylouw
+    // std::unique_lock<std::mutex> lock(last_motor_message_mutex_);
 
     // Save motor commands
     last_motor_message_ = *motor_msg;
 
-    lock.unlock();
-    last_motor_message_cond_.notify_one();
+    // lock.unlock();
+    // last_motor_message_cond_.notify_one();
 }
 
 bool GazeboForcesMomentsActuatorsPlugin::IsValidConfig(std::string config) {
