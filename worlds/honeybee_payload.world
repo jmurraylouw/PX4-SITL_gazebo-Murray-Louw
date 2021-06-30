@@ -12,7 +12,7 @@
     <!-- Quadrotor -->
     <include>
       <uri>model://honeybee_payload</uri>
-      <pose>0 0 0.1 0 0 1.57</pose>
+      <pose>0 0 0.1 0 0 0</pose>
     </include>
 
     <!-- Only one ROS interface plugin is required per world, as any other plugin can connect a Gazebo
