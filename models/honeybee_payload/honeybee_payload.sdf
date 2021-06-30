@@ -46,10 +46,14 @@
       <velocity_decay/>
     </link>
 
-    <link name='payload'>
+    <!-- edit here for link length -->
+    <!-- link: <pose frame=''> 0 0 -L 0 0 0</pose>
+    joint: <pose frame=''> 0 0 L 0 0 0 </pose> -->
+
+    <!-- <link name='payload'>
       <pose frame=''> 0 0 -0.5 0 0 0</pose>
       <inertial>
-        <mass>0.5</mass>
+        <mass>0.2</mass> <>
         <pose frame=''>0 0 0 0 0 0</pose>
         <inertia>
           <ixx>0.01</ixx>
@@ -81,6 +85,7 @@
           </geometry>
       </visual>
     </link>
+
     <joint name="pendulum_arm_to_uav" type="universal">
       <parent>base_link</parent>
       <child>payload</child>
@@ -91,7 +96,7 @@
         <axis2>
           <xyz>0 1 0</xyz>
         </axis2>
-    </joint>
+    </joint> -->
 
     <link name='/imu_link'>
       <pose frame=''>0 0 0 0 -0 0</pose>
@@ -162,9 +167,9 @@
       <child>gps0::link</child>
     </joint>
 
-    <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
+    <!-- <plugin name='groundtruth_plugin' filename='libgazebo_groundtruth_plugin.so'>
       <robotNamespace/>
-    </plugin>
+    </plugin> -->
 
     <plugin name='magnetometer_plugin' filename='libgazebo_magnetometer_plugin.so'>
       <robotNamespace/>
