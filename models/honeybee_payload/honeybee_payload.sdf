@@ -40,20 +40,11 @@
       <visual name='base_link_inertia_visual'>
         <pose frame='base_link_frame'>0 0 -0.06 0 0 1.570796</pose>
         <geometry>
-          <box>
-            <size>0.2 0.3 0.1</size>
-          </box>
-          <!-- <mesh>
+          <mesh>
             <scale>1 1 1</scale>
             <uri>model://honeybee_payload/meshes/honeybee.dae</uri>
-          </mesh> -->
+          </mesh>
         </geometry>
-        <material>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/BlueTransparent</name>
-          </script>
-        </material>
       </visual>
       <gravity>1</gravity>
       <velocity_decay/>
