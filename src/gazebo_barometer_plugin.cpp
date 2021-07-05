@@ -93,10 +93,12 @@ void BarometerPlugin::getSdfParams(sdf::ElementPtr sdf)
     baro_drift_pa_per_sec_ = 0.0;
   }
 
-  if (sdf->HasElement("baroNoise")) {
-    has_noise = sdf->GetElement("baroNoise")->Get<bool>();
+  has_noise = true; // Default is to have noise
+  if (sdf->HasElement("noBaroNoise")) {
+    has_noise = false;
+    std::cout << "[gazebo_barometer_plugin]: No barometer noise added" << std::endl;
   } else {
-    has_noise = true; // Default is to have noise
+    std::cout << "[gazebo_barometer_plugin]: Barometer noise added by default" << std::endl;
   }
 
 }
@@ -186,7 +188,13 @@ void BarometerPlugin::OnUpdate(const common::UpdateInfo&)
     // Apply noise and drift
     const float abs_pressure_noise = 1.0f * (float)y1;  // 1 Pa RMS noise
     baro_drift_pa_ += baro_drift_pa_per_sec_ * dt;
-    const float absolute_pressure_noisy = absolute_pressure + abs_pressure_noise + baro_drift_pa_;
+    float absolute_pressure_noisy_temp; // Temporary variable
+    if(has_noise) { // @jmurraylouw
+      absolute_pressure_noisy_temp = absolute_pressure + abs_pressure_noise + baro_drift_pa_;
+    } else {
+      absolute_pressure_noisy_temp = absolute_pressure;
+    }
+    const float absolute_pressure_noisy = absolute_pressure_noisy_temp; // Assign noise or not to const
 
     // convert to hPa
     const float absolute_pressure_noisy_hpa = absolute_pressure_noisy * 0.01f;
@@ -197,9 +205,13 @@ void BarometerPlugin::OnUpdate(const common::UpdateInfo&)
     const float rho = 1.225f / density_ratio;
 
     // calculate pressure altitude including effect of pressure noise
-    baro_msg_.set_pressure_altitude(alt_msl -
+    if(has_noise) { // @jmurraylouw
+      baro_msg_.set_pressure_altitude(alt_msl -
                                     (abs_pressure_noise + baro_drift_pa_) /
                                         (gravity_W_.Length() * rho));
+    } else { // exclude effect of drift
+      baro_msg_.set_pressure_altitude(alt_msl);
+    }
 
     // calculate temperature in Celsius
     baro_msg_.set_temperature(temperature_local - 273.0f);

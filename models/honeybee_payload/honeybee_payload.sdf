@@ -192,6 +192,7 @@
       <pubRate>50</pubRate>
       <baroTopic>/baro</baroTopic>
       <baroDriftPaPerSec>0</baroDriftPaPerSec>
+      <noBaroNoise/>
     </plugin>
 
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
