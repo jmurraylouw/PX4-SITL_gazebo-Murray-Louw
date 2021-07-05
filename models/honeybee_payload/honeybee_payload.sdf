@@ -232,6 +232,7 @@
       <accelerometerRandomWalk>0.006</accelerometerRandomWalk>
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
+      <noIMUNoise/>
     </plugin>
 
     <!-- Thrust based motor plugin: -->
