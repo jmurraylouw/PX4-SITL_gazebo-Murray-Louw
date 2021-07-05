@@ -186,11 +186,6 @@ void BarometerPlugin::OnUpdate(const common::UpdateInfo&)
     // Apply noise and drift
     const float abs_pressure_noise = 1.0f * (float)y1;  // 1 Pa RMS noise
     baro_drift_pa_ += baro_drift_pa_per_sec_ * dt;
-    if(has_noise) {
-      const float absolute_pressure_noisy = absolute_pressure + abs_pressure_noise + baro_drift_pa_;
-    } else { // If it shoule NOT have noise, do not add noise
-      const float absolute_pressure_noisy = absolute_pressure;
-    }
     const float absolute_pressure_noisy = absolute_pressure + abs_pressure_noise + baro_drift_pa_;
 
     // convert to hPa

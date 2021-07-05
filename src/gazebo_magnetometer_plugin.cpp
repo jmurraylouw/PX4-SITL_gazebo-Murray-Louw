@@ -99,6 +99,14 @@ void MagnetometerPlugin::getSdfParams(sdf::ElementPtr sdf)
     gzwarn << "[gazebo_magnetometer_plugin] Using default magnetometer topic " << mag_topic_ << "\n";
   }
 
+  has_noise = true; // Default is to have noise
+  if (sdf->HasElement("noMagNoise")) { //@jmurraylouw
+    has_noise = false;
+    std::cout << "[gazebo_magnetometer_plugin]: No magnetometer noise added" << std::endl;
+  } else {
+    std::cout << "[gazebo_magnetometer_plugin]: Magnetometer noise added by default" << std::endl;
+  }
+
   gt_sub_topic_ = "/groundtruth";
 }
 
@@ -196,7 +204,9 @@ void MagnetometerPlugin::OnUpdate(const common::UpdateInfo&)
 
     // Magnetometer noise
     Eigen::Vector3d magnetic_field_I(X, Y, Z);
-    addNoise(&magnetic_field_I, dt);
+    if(has_noise) {
+      addNoise(&magnetic_field_I, dt); // Only add noise, if noise is enabled @jmurraylouw
+    }
 
     // Fill magnetometer messgae
     mag_message_.set_time_usec(current_time.Double() * 1e6);

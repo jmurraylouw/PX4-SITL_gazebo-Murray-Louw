@@ -109,6 +109,8 @@ private:
   double random_walk_;
   double bias_correlation_time_;
 
+  bool has_noise;
+
   Eigen::Vector3d bias_;
 
   std::default_random_engine random_generator_;

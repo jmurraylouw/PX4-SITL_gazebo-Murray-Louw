@@ -184,6 +184,7 @@
       <randomWalk>6.4e-06</randomWalk>
       <biasCorrelationTime>600</biasCorrelationTime>
       <magTopic>/mag</magTopic>
+      <noMagNoise/>
     </plugin>
 
     <plugin name='barometer_plugin' filename='libgazebo_barometer_plugin.so'>
@@ -191,7 +192,6 @@
       <pubRate>50</pubRate>
       <baroTopic>/baro</baroTopic>
       <baroDriftPaPerSec>0</baroDriftPaPerSec>
-      <baroNoise>0</baroNoise>
     </plugin>
 
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
