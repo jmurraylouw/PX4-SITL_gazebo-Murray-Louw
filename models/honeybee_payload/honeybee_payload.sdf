@@ -114,7 +114,7 @@
                       <length>L2</length>
     joint: <pose frame=''> 0 0 L2 0 0 0 </pose> -->
 
-    <link name='payload_2'>
+    <!-- <link name='payload_2'>
       <frame name='payload_2_frame'/>
       <pose frame=''>0 0 -1.3 0 0 0</pose>
       <inertial>
@@ -162,7 +162,7 @@
         <axis2>
           <xyz>0 1 0</xyz>
         </axis2>
-    </joint>
+    </joint> -->
 
     <link name='/imu_link'>
       <pose frame=''>0 0 0 0 -0 0</pose>
@@ -263,14 +263,14 @@
       <mavlink_addr>INADDR_ANY</mavlink_addr>
       <mavlink_udp_port>14560</mavlink_udp_port>
       <mavlink_tcp_port>4560</mavlink_tcp_port>
-      <serialEnabled>0</serialEnabled>
+      <serialEnabled>1</serialEnabled>
       <serialDevice>/dev/ttyACM0</serialDevice>
       <baudRate>921600</baudRate>
       <qgc_addr>INADDR_ANY</qgc_addr>
       <qgc_udp_port>14550</qgc_udp_port>
       <sdk_addr>INADDR_ANY</sdk_addr>
       <sdk_udp_port>14540</sdk_udp_port>
-      <hil_mode>0</hil_mode>
+      <hil_mode>1</hil_mode>
       <hil_state_level>0</hil_state_level>
       <vehicle_is_tailsitter>0</vehicle_is_tailsitter>
       <send_vision_estimation>0</send_vision_estimation>
@@ -280,6 +280,11 @@
       <motorCommandPubTopic>/gazebo/command/motor_throttle</motorCommandPubTopic>
     </plugin>
     <static>0</static>
+
+<!-- For HITL:
+<hil_mode>1</hil_mode>
+<serialEnabled>1</serialEnabled>
+ -->
 
     <plugin name='rotors_gazebo_imu_plugin' filename='libgazebo_imu_plugin.so'>
       <robotNamespace/>
