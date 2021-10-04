@@ -958,11 +958,11 @@ void GazeboMavlinkInterface::SendGroundTruth()
   // ignition::math::Quaterniond payload_quat = payload_pose.Rot();
 
   // Copy ignition::math::Quaterniond to gazebo::msgs::Quaternion
-  gazebo::msgs::Quaternion* orientation = new gazebo::msgs::Quaternion();
-  orientation->set_x(C_W_I.X());
-  orientation->set_y(C_W_I.Y());
-  orientation->set_z(C_W_I.Z());
-  orientation->set_w(C_W_I.W());
+  // gazebo::msgs::Quaternion* orientation = new gazebo::msgs::Quaternion();
+  // orientation->set_x(C_W_I.X());
+  // orientation->set_y(C_W_I.Y());
+  // orientation->set_z(C_W_I.Z());
+  // orientation->set_w(C_W_I.W());
 
   // ground truth
   ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
