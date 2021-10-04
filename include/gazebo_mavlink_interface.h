@@ -258,6 +258,7 @@ private:
   transport::PublisherPtr motor_reference_pub_; // @jmurraylouw
   transport::SubscriberPtr mav_control_sub_;
 
+  physics::LinkPtr payload_link; // @jmurraylouw
   physics::ModelPtr model_;
   physics::WorldPtr world_;
   physics::JointPtr left_elevon_joint_;
