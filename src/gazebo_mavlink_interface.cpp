@@ -127,6 +127,7 @@ void GazeboMavlinkInterface::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf
 
   model_ = _model;
   world_ = model_->GetWorld();
+  payload_link_ = model_->GetLink("payload"); //@jmurraylouw
 
   namespace_.clear();
   if (_sdf->HasElement("robotNamespace")) {
@@ -951,6 +952,12 @@ void GazeboMavlinkInterface::SendSensorMessages()
 
 void GazeboMavlinkInterface::SendGroundTruth()
 {
+  // @jmurraylouw
+  // Get payload quaternion
+  ignition::math::Pose3d payload_pose = payload_link_->WorldPose();
+  ignition::math::Quaterniond payload_quat = payload_pose.Rot();
+  ignition::math::Vector3d payload_euler = payload_quat.Euler();
+
   // ground truth
   ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
     last_imu_message_.orientation().w(),
