@@ -693,6 +693,25 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   // Always send Gyro and Accel data at full rate (= sim update rate)
   SendSensorMessages();
 
+  // @jmurraylouw
+  // std::cout << "[gazebo_mavlink_interface]: Test SendGroundTruth() message" << std::endl;
+
+  // @jmurraylouw
+  // Get payload quaternion
+  ignition::math::Pose3d payload_pose = payload_link_->WorldPose();
+  ignition::math::Quaterniond payload_quat = payload_pose.Rot();
+  ignition::math::Vector3d payload_euler = payload_quat.Euler();
+
+  // Set Euler angles into optical flow message
+  mavlink_hil_optical_flow_t sensor_msg;
+  sensor_msg.integrated_x = (float)payload_euler.X();
+  sensor_msg.integrated_y = (float)payload_euler.Y();
+
+  // Send payload angle message as optical flow (MAVROS output at: rostopic echo /mavros/px4flow/raw/optical_flow_rad )
+  mavlink_message_t msg;
+  mavlink_msg_hil_optical_flow_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
+  send_mavlink_message(&msg);
+
   // Send groudntruth at full rate
   SendGroundTruth();
 
@@ -952,14 +971,6 @@ void GazeboMavlinkInterface::SendSensorMessages()
 
 void GazeboMavlinkInterface::SendGroundTruth()
 {
-  // std::cout << "[gazebo_mavlink_interface]: Test SendGroundTruth() message" << std::endl;
-
-  // @jmurraylouw
-  // Get payload quaternion
-  ignition::math::Pose3d payload_pose = payload_link_->WorldPose();
-  ignition::math::Quaterniond payload_quat = payload_pose.Rot();
-  ignition::math::Vector3d payload_euler = payload_quat.Euler();
-
   // ground truth
   ignition::math::Quaterniond q_gr = ignition::math::Quaterniond(
     last_imu_message_.orientation().w(),
@@ -1027,25 +1038,6 @@ void GazeboMavlinkInterface::SendGroundTruth()
     mavlink_msg_hil_state_quaternion_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &hil_state_quat);
     send_mavlink_message(&msg);
   }
-
-  try {
-        // Hide payload euler angle values in rc channels @jmurraylouw
-        mavlink_rc_channels_t rc_channels;
-        rc_channels.chan1_raw = (uint32_t)round(payload_euler.X() * 65000 / (M_PI/2) + 32500 ); // Convert to int value representing angle. Max int value: 65000 (actually 65535)
-        rc_channels.chan2_raw = (uint32_t)round(payload_euler.Y() * 65000 / (M_PI/2) + 32500 );
-        rc_channels.chan3_raw = (uint32_t)round(payload_euler.Z() * 65000 / (M_PI/2) + 32500 );
-
-        // std::cout << "[gazebo_mavlink_interface]: Euler angles (rad): " << rc_channels.chan1_raw << " " << rc_channels.chan2_raw << " " << rc_channels.chan3_raw  << std::endl;
-        // std::cout << "[gazebo_mavlink_interface]: Euler angles (rad): " << rc_channels.chan2_raw << " " << payload_euler.Y() << std::endl;
-
-        // Encode and send message @jmurraylouw
-        mavlink_message_t payload_msg; // Empty message for rc_channels
-        mavlink_msg_rc_channels_encode_chan(1, 200, MAVLINK_COMM_0, &payload_msg, &rc_channels); // Encode a RC_CHANNELS mavlink message
-        send_mavlink_message(&payload_msg);
-
-      } catch(...) {
-        std::cout << "Error in payload angle to rc_channels" << std::endl;
-      }
 
 }
 
