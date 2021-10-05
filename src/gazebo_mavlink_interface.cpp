@@ -696,22 +696,22 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   // @jmurraylouw
   // std::cout << "[gazebo_mavlink_interface]: Test SendGroundTruth() message" << std::endl;
 
-  // @jmurraylouw
+  // @jmurraylouw:
   // Get payload quaternion
   ignition::math::Pose3d payload_pose = payload_link_->WorldPose();
   ignition::math::Quaterniond payload_quat = payload_pose.Rot();
   ignition::math::Vector3d payload_euler = payload_quat.Euler();
 
   // Set Euler angles into optical flow message
-  mavlink_hil_optical_flow_t sensor_msg;
-  sensor_msg.integrated_xgyro = (float)payload_euler.X();
-  sensor_msg.integrated_ygyro = (float)payload_euler.Y();
-  sensor_msg.integrated_zgyro = (float)payload_euler.Z();
+  mavlink_hil_optical_flow_t payload_angle_msg;
+  payload_angle_msg.integrated_xgyro = (float)payload_euler.X();
+  payload_angle_msg.integrated_ygyro = (float)payload_euler.Y();
+  payload_angle_msg.integrated_zgyro = (float)payload_euler.Z();
 
   // Send payload angle message as optical flow (MAVROS output at: rostopic echo /mavros/px4flow/raw/optical_flow_rad )
   mavlink_message_t msg;
-  mavlink_msg_hil_optical_flow_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &sensor_msg);
-  send_mavlink_message(&msg);
+  mavlink_msg_hil_optical_flow_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &payload_angle_msg);
+  send_mavlink_message(&msg)
 
   // Send groudntruth at full rate
   SendGroundTruth();
