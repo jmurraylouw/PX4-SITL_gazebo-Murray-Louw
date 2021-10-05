@@ -711,7 +711,7 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
   // Send payload angle message as optical flow (MAVROS output at: rostopic echo /mavros/px4flow/raw/optical_flow_rad )
   mavlink_message_t msg;
   mavlink_msg_hil_optical_flow_encode_chan(1, 200, MAVLINK_COMM_0, &msg, &payload_angle_msg);
-  send_mavlink_message(&msg)
+  send_mavlink_message(&msg);
 
   // Send groudntruth at full rate
   SendGroundTruth();
