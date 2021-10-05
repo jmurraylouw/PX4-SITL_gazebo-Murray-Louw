@@ -704,8 +704,9 @@ void GazeboMavlinkInterface::OnUpdate(const common::UpdateInfo&  /*_info*/) {
 
   // Set Euler angles into optical flow message
   mavlink_hil_optical_flow_t sensor_msg;
-  sensor_msg.integrated_x = (float)payload_euler.X();
-  sensor_msg.integrated_y = (float)payload_euler.Y();
+  sensor_msg.integrated_xgyro = (float)payload_euler.X();
+  sensor_msg.integrated_ygyro = (float)payload_euler.Y();
+  sensor_msg.integrated_zgyro = (float)payload_euler.Z();
 
   // Send payload angle message as optical flow (MAVROS output at: rostopic echo /mavros/px4flow/raw/optical_flow_rad )
   mavlink_message_t msg;
